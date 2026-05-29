@@ -2,6 +2,7 @@ import { Elysia } from "elysia";
 import { cors } from "@elysiajs/cors";
 import { swagger } from "@elysiajs/swagger";
 import { db } from "./db";
+import { userRoute } from "./routes/user-route";
 
 const port = process.env.PORT || 3000;
 
@@ -19,6 +20,7 @@ const app = new Elysia()
     })
   )
   .decorate("db", db) // Inject Drizzle instance into request context
+  .use(userRoute)
   .get("/", () => {
     return {
       status: "success",
