@@ -53,5 +53,33 @@ export class UsersService {
 
     return token;
   }
+
+  static async getCurrentUser(token: string) {
+    // 1. Cari sesi berdasarkan token
+    const session = await db.query.sessions.findFirst({
+      where: eq(sessions.token, token),
+    });
+
+    if (!session) {
+      throw new Error("Unauthorized");
+    }
+
+    // 2. Cari user berdasarkan userId dari sesi
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, session.userId),
+    });
+
+    if (!user) {
+      throw new Error("Unauthorized");
+    }
+
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      created_at: user.createdAt,
+    };
+  }
 }
+
 
