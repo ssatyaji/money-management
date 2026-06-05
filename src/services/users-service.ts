@@ -80,6 +80,20 @@ export class UsersService {
       created_at: user.createdAt,
     };
   }
+
+  static async logoutUser(token: string) {
+    // 1. Cari sesi berdasarkan token
+    const session = await db.query.sessions.findFirst({
+      where: eq(sessions.token, token),
+    });
+
+    if (!session) {
+      throw new Error("Unauthorized");
+    }
+
+    // 2. Hapus sesi dari database
+    await db.delete(sessions).where(eq(sessions.token, token));
+  }
 }
 
 
