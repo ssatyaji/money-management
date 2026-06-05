@@ -80,6 +80,13 @@ export class UsersService {
       created_at: user.createdAt,
     };
   }
+
+  static async logoutUser(token: string) {
+    const [result] = await db.delete(sessions).where(eq(sessions.token, token));
+    if (result.affectedRows === 0) {
+      throw new Error("Unauthorized");
+    }
+  }
 }
 
 
