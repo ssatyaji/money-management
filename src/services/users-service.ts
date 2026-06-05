@@ -82,17 +82,10 @@ export class UsersService {
   }
 
   static async logoutUser(token: string) {
-    // 1. Cari sesi berdasarkan token
-    const session = await db.query.sessions.findFirst({
-      where: eq(sessions.token, token),
-    });
-
-    if (!session) {
+    const [result] = await db.delete(sessions).where(eq(sessions.token, token));
+    if (result.affectedRows === 0) {
       throw new Error("Unauthorized");
     }
-
-    // 2. Hapus sesi dari database
-    await db.delete(sessions).where(eq(sessions.token, token));
   }
 }
 

@@ -2,6 +2,19 @@ import { Elysia, t } from "elysia";
 import { UsersService } from "../services/users-service";
 
 export const userRoute = new Elysia()
+  .derive(({ headers }) => ({
+    getAuthToken: () => {
+      const auth = headers["authorization"];
+      if (!auth || !auth.startsWith("Bearer ")) {
+        throw new Error("Unauthorized");
+      }
+      const token = auth.split(" ")[1];
+      if (!token) {
+        throw new Error("Unauthorized");
+      }
+      return token;
+    }
+  }))
   .post(
     "/users/register",
     async ({ body, set }) => {
@@ -41,45 +54,35 @@ export const userRoute = new Elysia()
   )
   .get(
     "/api/users/current",
-    async ({ headers, set }) => {
+    async ({ getAuthToken, set }) => {
       try {
-        const auth = headers["authorization"];
-        if (!auth || !auth.startsWith("Bearer ")) {
-          set.status = 401;
-          return { error: "Unauthorized" };
-        }
-        const token = auth.split(" ")[1];
-        if (!token) {
-          set.status = 401;
-          return { error: "Unauthorized" };
-        }
+        const token = getAuthToken();
         const user = await UsersService.getCurrentUser(token);
         return { data: user };
       } catch (error: any) {
-        set.status = 401;
-        return { error: "Unauthorized" };
+        if (error.message === "Unauthorized") {
+          set.status = 401;
+          return { error: "Unauthorized" };
+        }
+        set.status = 500;
+        return { error: "Internal Server Error" };
       }
     }
   )
   .delete(
     "/api/users/logout",
-    async ({ headers, set }) => {
+    async ({ getAuthToken, set }) => {
       try {
-        const auth = headers["authorization"];
-        if (!auth || !auth.startsWith("Bearer ")) {
-          set.status = 401;
-          return { error: "Unauthorized" };
-        }
-        const token = auth.split(" ")[1];
-        if (!token) {
-          set.status = 401;
-          return { error: "Unauthorized" };
-        }
+        const token = getAuthToken();
         await UsersService.logoutUser(token);
         return { data: "OK" };
       } catch (error: any) {
-        set.status = 401;
-        return { error: "Unauthorized" };
+        if (error.message === "Unauthorized") {
+          set.status = 401;
+          return { error: "Unauthorized" };
+        }
+        set.status = 500;
+        return { error: "Internal Server Error" };
       }
     }
   );
