@@ -32,6 +32,14 @@ export const userRoute = new Elysia()
         email: t.String({ format: "email", maxLength: 255 }),
         password: t.String({ maxLength: 255 }),
       }),
+      response: {
+        200: t.Object({
+          data: t.String()
+        }),
+        400: t.Object({
+          error: t.String()
+        })
+      },
       detail: {
         tags: ["Users"],
         summary: "Registrasi akun baru",
@@ -55,6 +63,14 @@ export const userRoute = new Elysia()
         email: t.String(),
         password: t.String(),
       }),
+      response: {
+        200: t.Object({
+          data: t.String()
+        }),
+        401: t.Object({
+          error: t.String()
+        })
+      },
       detail: {
         tags: ["Authentication"],
         summary: "Login Pengguna",
@@ -79,6 +95,22 @@ export const userRoute = new Elysia()
       }
     },
     {
+      response: {
+        200: t.Object({
+          data: t.Object({
+            id: t.Number(),
+            name: t.String(),
+            email: t.String(),
+            created_at: t.Any(),
+          })
+        }),
+        401: t.Object({
+          error: t.String()
+        }),
+        500: t.Object({
+          error: t.String()
+        })
+      },
       detail: {
         tags: ["Users"],
         summary: "Dapatkan profil user",
@@ -104,6 +136,17 @@ export const userRoute = new Elysia()
       }
     },
     {
+      response: {
+        200: t.Object({
+          data: t.String()
+        }),
+        401: t.Object({
+          error: t.String()
+        }),
+        500: t.Object({
+          error: t.String()
+        })
+      },
       detail: {
         tags: ["Authentication"],
         summary: "Logout",
