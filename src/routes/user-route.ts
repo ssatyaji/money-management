@@ -32,6 +32,19 @@ export const userRoute = new Elysia()
         email: t.String({ format: "email", maxLength: 255 }),
         password: t.String({ maxLength: 255 }),
       }),
+      response: {
+        200: t.Object({
+          data: t.String()
+        }),
+        400: t.Object({
+          error: t.String()
+        })
+      },
+      detail: {
+        tags: ["Users"],
+        summary: "Registrasi akun baru",
+        description: "Mendaftarkan akun pengguna baru dengan name, email, dan password.",
+      },
     }
   )
   .post(
@@ -50,6 +63,19 @@ export const userRoute = new Elysia()
         email: t.String(),
         password: t.String(),
       }),
+      response: {
+        200: t.Object({
+          data: t.String()
+        }),
+        401: t.Object({
+          error: t.String()
+        })
+      },
+      detail: {
+        tags: ["Authentication"],
+        summary: "Login Pengguna",
+        description: "Memasukkan email dan password untuk mendapatkan token sesi.",
+      },
     }
   )
   .get(
@@ -67,6 +93,30 @@ export const userRoute = new Elysia()
         set.status = 500;
         return { error: "Internal Server Error" };
       }
+    },
+    {
+      response: {
+        200: t.Object({
+          data: t.Object({
+            id: t.Number(),
+            name: t.String(),
+            email: t.String(),
+            created_at: t.Any(),
+          })
+        }),
+        401: t.Object({
+          error: t.String()
+        }),
+        500: t.Object({
+          error: t.String()
+        })
+      },
+      detail: {
+        tags: ["Users"],
+        summary: "Dapatkan profil user",
+        description: "Mendapatkan data profil user yang sedang login berdasarkan Bearer token (UUID) sesi aktif.",
+        security: [{ bearerAuth: [] }],
+      },
     }
   )
   .delete(
@@ -84,6 +134,25 @@ export const userRoute = new Elysia()
         set.status = 500;
         return { error: "Internal Server Error" };
       }
+    },
+    {
+      response: {
+        200: t.Object({
+          data: t.String()
+        }),
+        401: t.Object({
+          error: t.String()
+        }),
+        500: t.Object({
+          error: t.String()
+        })
+      },
+      detail: {
+        tags: ["Authentication"],
+        summary: "Logout",
+        description: "Mengakhiri sesi pengguna aktif dengan menghapus token sesi (UUID) dari database.",
+        security: [{ bearerAuth: [] }],
+      },
     }
   );
 
