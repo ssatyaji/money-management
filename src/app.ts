@@ -8,11 +8,22 @@ export const app = new Elysia()
   .use(cors())
   .use(
     swagger({
+      path: '/swagger',
       documentation: {
         info: {
           title: "Money Management API Documentation",
           version: "1.0.0",
           description: "API documentation for the Money Management backend project",
+        },
+        components: {
+          securitySchemes: {
+            bearerAuth: {
+              type: 'http',
+              scheme: 'bearer',
+              bearerFormat: 'UUID',
+              description: 'Masukkan token sesi (UUID) yang didapatkan dari proses login'
+            },
+          },
         },
       },
     })
